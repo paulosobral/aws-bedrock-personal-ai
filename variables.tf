@@ -4,7 +4,7 @@ variable "default_tags" {
   description = "Tags obrigatórias para governança (aplicadas a todos os recursos)"
   type        = map(string)
   default = {
-    Owner       = "psobral89"
+    Owner       = "personal"
     Environment = "Dev"
     Service     = "Bedrock"
     ManagedBy   = "Terraform"
@@ -15,7 +15,7 @@ variable "default_tags" {
 variable "bedrock_role_name" {
   description = "Nome da IAM Role para Bedrock"
   type        = string
-  default     = "bedrock-user-psobral89-role"
+  default     = "bedrock-user-personal-role"
 }
 
 variable "permission_boundary_arn" {
@@ -39,25 +39,25 @@ variable "enable_cloudtrail" {
 variable "cloudtrail_bucket_name" {
   description = "Nome do bucket S3 para logs do CloudTrail - OBRIGATÓRIO se enable_cloudtrail=true"
   type        = string
-  default     = "cloudtrail-logs-bedrock-psobral89"
+  default     = "cloudtrail-logs-bedrock-personal"
 }
 
 # Variáveis Cost Alarm
 variable "sns_topic_name" {
   description = "Nome do tópico SNS para alertas de custo"
   type        = string
-  default     = "bedrock-cost-alerts-psobral89"
+  default     = "bedrock-cost-alerts-personal"
 }
 
 variable "notification_email" {
-  description = "E-mail para notificações de custo (psobral89) - OBRIGATÓRIO"
+  description = "E-mail para notificações de custo (personal) - OBRIGATÓRIO"
   type        = string
 }
 
 variable "budget_name" {
   description = "Nome do orçamento AWS Budgets"
   type        = string
-  default     = "bedrock-budget-psobral89"
+  default     = "bedrock-budget-personal"
 }
 
 variable "budget_limit" {
@@ -75,7 +75,7 @@ variable "notification_threshold" {
 variable "alarm_prefix" {
   description = "Prefixo para nomes dos alarmes CloudWatch"
   type        = string
-  default     = "bedrock-psobral89"
+  default     = "bedrock-personal"
 }
 
 variable "alarm_period" {

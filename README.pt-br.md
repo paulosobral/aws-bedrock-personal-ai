@@ -50,11 +50,13 @@ Infraestrutura como código (Terraform) para provisionar acesso seguro e monitor
 | [Node.js](https://nodejs.org/) | `>= 18` | Necessário para instalar o Claude Code via `npm` | [Download](https://nodejs.org/) |
 | [Claude Code](https://www.npmjs.com/package/@anthropic-ai/claude-code) | `2.1.92` | Cliente que consome o Bedrock (opcional, ver seção [Consumindo os recursos](#consumindo-os-recursos-setup-do-cliente)) | `npm install -g @anthropic-ai/claude-code@2.1.92` |
 | Provider AWS (Terraform) | `~> 5.0` | Instalado automaticamente pelo `terraform init` | — |
+| `jq` | qualquer | Necessário pelo `bedrock-cost-report.sh` para parsear o JSON da AWS CLI | `apt install jq` / `brew install jq` |
+| `awk` | qualquer | Necessário pelo `bedrock-cost-report.sh` para os cálculos de custo | geralmente já vem instalado no Linux/macOS |
 
 ### Conta e acesso AWS
 
 - Conta AWS com credenciais configuradas (`aws configure` ou variáveis de ambiente `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY`/`AWS_SESSION_TOKEN`) e permissão para criar recursos IAM, SNS, Budgets, CloudWatch e (opcionalmente) CloudTrail.
-- Bucket S3 já existente para o backend remoto do Terraform (`terraform-state-bedrock-psobral89`) e, se `enable_cloudtrail = true`, um bucket S3 para os logs do CloudTrail.
+- Bucket S3 já existente para o backend remoto do Terraform (`terraform-state-bedrock-personal`) e, se `enable_cloudtrail = true`, um bucket S3 para os logs do CloudTrail.
 - Acesso liberado aos modelos desejados no [console do Bedrock (Model access)](https://console.aws.amazon.com/bedrock/) — isso é feito manualmente pela AWS e não é provisionado pelo Terraform.
 - Preços atuais dos modelos: [aws.amazon.com/bedrock/pricing](https://aws.amazon.com/bedrock/pricing/).
 
@@ -83,12 +85,12 @@ Todas as variáveis possuem valores padrão em `variables.tf`. As mais relevante
 
 | Variável | Descrição | Default |
 |---|---|---|
-| `bedrock_role_name` | Nome da IAM Role | `bedrock-user-psobral89-role` |
+| `bedrock_role_name` | Nome da IAM Role | `bedrock-user-personal-role` |
 | `notification_email` | E-mail para alertas de custo | `paulo.sobral@outlook.com.br` |
 | `budget_limit` | Limite mensal do orçamento (USD) | `50.0` |
 | `notification_threshold` | % do orçamento para notificar | `80.0` |
 | `enable_cloudtrail` | Habilita auditoria via CloudTrail | `true` |
-| `cloudtrail_bucket_name` | Bucket S3 para logs do CloudTrail | `cloudtrail-logs-bedrock-psobral89` |
+| `cloudtrail_bucket_name` | Bucket S3 para logs do CloudTrail | `cloudtrail-logs-bedrock-personal` |
 | `enable_token_alarm` / `token_threshold` | Alarme de tokens consumidos | `true` / `100000` |
 | `enable_invocation_alarm` / `invocation_threshold` | Alarme de nº de chamadas | `true` / `1000` |
 | `enable_cost_alarm` / `cost_threshold` | Alarme de custo acumulado (USD) | `true` / `10.0` |

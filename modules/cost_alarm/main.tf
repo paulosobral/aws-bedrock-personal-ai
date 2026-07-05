@@ -4,7 +4,7 @@
 # Tópico SNS para notificações de custo
 resource "aws_sns_topic" "cost_alerts" {
   name         = var.sns_topic_name
-  display_name = "Bedrock Cost Alerts - psobral89"
+  display_name = "Bedrock Cost Alerts - personal"
   tags = merge(
     var.tags,
     {
@@ -13,7 +13,7 @@ resource "aws_sns_topic" "cost_alerts" {
   )
 }
 
-# Assinatura de e-mail para psobral89
+# Assinatura de e-mail para personal
 resource "aws_sns_topic_subscription" "email_subscription" {
   count     = var.notification_email != "" ? 1 : 0
   topic_arn = aws_sns_topic.cost_alerts.arn
@@ -58,7 +58,7 @@ resource "aws_cloudwatch_metric_alarm" "token_consumption" {
   period              = var.period
   statistic           = "Sum"
   threshold           = var.token_threshold
-  alarm_description   = "Alarme para consumo de tokens Bedrock - usuário psobral89"
+  alarm_description   = "Alarme para consumo de tokens Bedrock - usuário personal"
   alarm_actions       = [aws_sns_topic.cost_alerts.arn]
   ok_actions          = [aws_sns_topic.cost_alerts.arn]
 
@@ -80,7 +80,7 @@ resource "aws_cloudwatch_metric_alarm" "invocation_count" {
   period              = var.period
   statistic           = "Sum"
   threshold           = var.invocation_threshold
-  alarm_description   = "Alarme para número de chamadas ao modelo Bedrock - usuário psobral89"
+  alarm_description   = "Alarme para número de chamadas ao modelo Bedrock - usuário personal"
   alarm_actions       = [aws_sns_topic.cost_alerts.arn]
   ok_actions          = [aws_sns_topic.cost_alerts.arn]
 
@@ -102,7 +102,7 @@ resource "aws_cloudwatch_metric_alarm" "cost_accumulated" {
   period              = var.period
   statistic           = "Maximum"
   threshold           = var.cost_threshold
-  alarm_description   = "Alarme para custo acumulado Bedrock - usuário psobral89"
+  alarm_description   = "Alarme para custo acumulado Bedrock - usuário personal"
   alarm_actions       = [aws_sns_topic.cost_alerts.arn]
   ok_actions          = [aws_sns_topic.cost_alerts.arn]
 

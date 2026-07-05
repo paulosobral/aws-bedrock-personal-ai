@@ -3,14 +3,14 @@
 variable "role_name" {
   description = "Nome da IAM Role para Bedrock"
   type        = string
-  default     = "bedrock-user-psobral89-role"
+  default     = "bedrock-user-personal-role"
 }
 
 variable "tags" {
   description = "Tags obrigatórias para governança"
   type        = map(string)
   default = {
-    Owner       = "psobral89"
+    Owner       = "personal"
     Environment = "Dev"
     Service     = "Bedrock"
   }

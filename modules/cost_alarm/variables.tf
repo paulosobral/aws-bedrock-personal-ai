@@ -3,11 +3,11 @@
 variable "sns_topic_name" {
   description = "Nome do tópico SNS para alertas de custo"
   type        = string
-  default     = "bedrock-cost-alerts-psobral89"
+  default     = "bedrock-cost-alerts-personal"
 }
 
 variable "notification_email" {
-  description = "E-mail para notificações de custo (psobral89)"
+  description = "E-mail para notificações de custo (personal)"
   type        = string
   default     = ""
 }
@@ -15,7 +15,7 @@ variable "notification_email" {
 variable "budget_name" {
   description = "Nome do orçamento AWS Budgets"
   type        = string
-  default     = "bedrock-budget-psobral89"
+  default     = "bedrock-budget-personal"
 }
 
 variable "budget_limit" {
@@ -33,7 +33,7 @@ variable "notification_threshold" {
 variable "alarm_prefix" {
   description = "Prefixo para nomes dos alarmes CloudWatch"
   type        = string
-  default     = "bedrock-psobral89"
+  default     = "bedrock-personal"
 }
 
 variable "period" {
@@ -88,7 +88,7 @@ variable "tags" {
   description = "Tags obrigatórias para governança"
   type        = map(string)
   default = {
-    Owner       = "psobral89"
+    Owner       = "personal"
     Environment = "Dev"
     Service     = "Bedrock"
   }

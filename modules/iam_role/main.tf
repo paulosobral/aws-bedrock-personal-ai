@@ -203,6 +203,51 @@ data "aws_iam_policy_document" "permission_boundary" {
   }
 }
 
+data "aws_caller_identity" "current" {}
+
+# Bucket S3 para logs do CloudTrail
+resource "aws_s3_bucket" "cloudtrail_logs" {
+  count         = var.enable_cloudtrail ? 1 : 0
+  bucket        = var.cloudtrail_bucket_name
+  force_destroy = true
+
+  tags = var.tags
+}
+
+resource "aws_s3_bucket_policy" "cloudtrail_logs" {
+  count  = var.enable_cloudtrail ? 1 : 0
+  bucket = aws_s3_bucket.cloudtrail_logs[0].id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AWSCloudTrailAclCheck"
+        Effect = "Allow"
+        Principal = {
+          Service = "cloudtrail.amazonaws.com"
+        }
+        Action   = "s3:GetBucketAcl"
+        Resource = "arn:aws:s3:::${var.cloudtrail_bucket_name}"
+      },
+      {
+        Sid    = "AWSCloudTrailWrite"
+        Effect = "Allow"
+        Principal = {
+          Service = "cloudtrail.amazonaws.com"
+        }
+        Action   = "s3:PutObject"
+        Resource = "arn:aws:s3:::${var.cloudtrail_bucket_name}/AWSLogs/${data.aws_caller_identity.current.account_id}/*"
+        Condition = {
+          StringEquals = {
+            "s3:x-amz-acl" = "bucket-owner-full-control"
+          }
+        }
+      }
+    ]
+  })
+}
+
 # CloudTrail para auditoria de chamadas Bedrock
 resource "aws_cloudtrail" "bedrock_audit" {
   count                         = var.enable_cloudtrail ? 1 : 0
@@ -213,4 +258,6 @@ resource "aws_cloudtrail" "bedrock_audit" {
   enable_logging                = true
 
   tags = var.tags
+
+  depends_on = [aws_s3_bucket_policy.cloudtrail_logs]
 }
