@@ -35,6 +35,7 @@ Infrastructure as code (Terraform) to provision secure and monitored access to A
 │       ├── main.tf
 │       ├── variables.tf
 │       └── outputs.tf
+├── bedrock-cost-report.sh    # Standalone script: estimates monthly cost from CloudWatch metrics
 └── .gitignore
 ```
 
@@ -55,6 +56,7 @@ Infrastructure as code (Terraform) to provision secure and monitored access to A
 - AWS account with configured credentials (`aws configure` or the `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY`/`AWS_SESSION_TOKEN` environment variables) and permission to create IAM, SNS, Budgets, CloudWatch and (optionally) CloudTrail resources.
 - An existing S3 bucket for the Terraform remote backend (`terraform-state-bedrock-psobral89`) and, if `enable_cloudtrail = true`, an S3 bucket for the CloudTrail logs.
 - Access enabled for the desired models in the [Bedrock console (Model access)](https://console.aws.amazon.com/bedrock/) — this is done manually by AWS and is not provisioned by Terraform.
+- Current model pricing: [aws.amazon.com/bedrock/pricing](https://aws.amazon.com/bedrock/pricing/).
 
 ## Usage
 
@@ -96,6 +98,26 @@ To override, create a `terraform.tfvars` (ignored by `.gitignore`) or pass `-var
 ## Outputs
 
 After `apply`, the main available outputs include `bedrock_role_arn`, `bedrock_user_arn`, `sns_topic_arn`, `budget_arn` and the names of the created alarms. The credentials (`bedrock_access_key_id` and `bedrock_secret_access_key`) are marked as `sensitive` — use `terraform output -raw <name>` to display them.
+
+## Cost report script (`bedrock-cost-report.sh`)
+
+Standalone bash script that estimates how much you'll pay in the current month for the Bedrock models you actually used, based on real CloudWatch metrics.
+
+What it does:
+- Discovers, via `aws cloudwatch list-metrics`, which model IDs generated `InputTokenCount`/`OutputTokenCount` since the 1st of the current month.
+- For each model, sums input/output tokens in the period via `aws cloudwatch get-metric-statistics`.
+- Resolves the USD price per 1M tokens in this order: local cache (`.pricing_cache.json`) → `aws pricing get-products` (only covers legacy models like Claude 2.x/3, since current Claude models are sold via AWS Marketplace and aren't exposed by this API) → interactive prompt, which then gets saved to the cache with an `updated_at` timestamp for reuse on the next run.
+- Prints cost per model (input/output/total) and the total for the month.
+
+Requirements: `aws` CLI, `jq`, `awk` (no `bc` needed). The role used must allow `cloudwatch:ListMetrics`, `cloudwatch:GetMetricStatistics` and `pricing:GetProducts` (already granted by the `iam_role` module in this project).
+
+Usage:
+
+```bash
+./bedrock-cost-report.sh
+```
+
+If a model's price isn't found automatically, the script asks for it interactively (USD per 1M tokens, check current pricing at [aws.amazon.com/bedrock/pricing](https://aws.amazon.com/bedrock/pricing/)). `.pricing_cache.json` is gitignored — review/update it manually whenever AWS pricing changes.
 
 ## Security
 

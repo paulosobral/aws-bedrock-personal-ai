@@ -1,0 +1,42 @@
+{
+  "us.anthropic.claude-haiku-4-5-20251001-v1:0": {
+    "input": "1.00",
+    "output": "5.00",
+    "updated_at": "2026-07-04T22:23:25"
+  },
+  "us.anthropic.claude-opus-4-1-20250805-v1:0": {
+    "input": "15.00",
+    "output": "75.00",
+    "updated_at": "2026-07-04T22:23:25"
+  },
+  "us.anthropic.claude-opus-4-5-20251101-v1:0": {
+    "input": "5.00",
+    "output": "25.00",
+    "updated_at": "2026-07-04T22:23:25"
+  },
+  "us.anthropic.claude-opus-4-6-v1": {
+    "input": "5.50",
+    "output": "27.50",
+    "updated_at": "2026-07-04T22:23:25"
+  },
+  "us.anthropic.claude-opus-4-7": {
+    "input": "5.00",
+    "output": "25.00",
+    "updated_at": "2026-07-04T22:23:25"
+  },
+  "us.anthropic.claude-sonnet-4-5-20250929-v1:0": {
+    "input": "3.00",
+    "output": "15.00",
+    "updated_at": "2026-07-04T22:23:25"
+  },
+  "us.anthropic.claude-sonnet-4-6": {
+    "input": "3.30",
+    "output": "16.50",
+    "updated_at": "2026-07-04T22:23:25"
+  },
+  "us.anthropic.claude-sonnet-5": {
+    "input": "2.00",
+    "output": "10.00",
+    "updated_at": "2026-07-04T22:23:25"
+  }
+}

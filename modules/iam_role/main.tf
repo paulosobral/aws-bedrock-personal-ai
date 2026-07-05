@@ -128,6 +128,19 @@ data "aws_iam_policy_document" "bedrock_permissions" {
   }
 
   statement {
+    sid    = "BedrockCostReporting"
+    effect = "Allow"
+
+    actions = [
+      "cloudwatch:ListMetrics",
+      "cloudwatch:GetMetricStatistics",
+      "pricing:GetProducts"
+    ]
+
+    resources = ["*"]
+  }
+
+  statement {
     sid    = "DenyNonBedrockIAM"
     effect = "Deny"
 
@@ -164,7 +177,10 @@ data "aws_iam_policy_document" "permission_boundary" {
     actions = [
       "bedrock:InvokeModel",
       "bedrock:InvokeModelWithResponseStream",
-      "bedrock:ListFoundationModels"
+      "bedrock:ListFoundationModels",
+      "cloudwatch:ListMetrics",
+      "cloudwatch:GetMetricStatistics",
+      "pricing:GetProducts"
     ]
 
     resources = ["*"]
@@ -177,7 +193,10 @@ data "aws_iam_policy_document" "permission_boundary" {
     not_actions = [
       "bedrock:InvokeModel",
       "bedrock:InvokeModelWithResponseStream",
-      "bedrock:ListFoundationModels"
+      "bedrock:ListFoundationModels",
+      "cloudwatch:ListMetrics",
+      "cloudwatch:GetMetricStatistics",
+      "pricing:GetProducts"
     ]
 
     resources = ["*"]
