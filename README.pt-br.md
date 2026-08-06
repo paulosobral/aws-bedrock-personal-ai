@@ -200,3 +200,57 @@ claude "responda apenas 'ok' se o Bedrock estiver acessível"
 ```
 
 Se a chamada falhar por permissão, confira se a role em `bedrock_role_arn` já tem acesso liberado ao modelo desejado no [console do Bedrock (Model access)](https://console.aws.amazon.com/bedrock/) — a policy do Terraform libera `InvokeModel`, mas a assinatura/habilitação do modelo em si é feita separadamente pela AWS.
+
+### 3. opencode apontando para o Bedrock
+
+Instale o opencode:
+
+```bash
+npm install -g opencode-ai
+```
+
+Adicione uma função wrapper no `~/.zshrc` (ou `~/.bashrc`) que seta as env vars do Bedrock e reescreve o `opencode.jsonc` antes de cada execução:
+
+```bash
+open-code() {
+  export AWS_PROFILE=bedrock
+  export AWS_REGION=us-east-1
+  export AWS_DEFAULT_REGION=us-east-1
+
+  mkdir -p "$HOME/.config/opencode"
+  cat > "$HOME/.config/opencode/opencode.jsonc" <<'EOF'
+{
+  "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "amazon-bedrock": {
+      "options": {
+        "region": "us-east-1"
+      }
+    }
+  }
+}
+EOF
+
+  opencode "$@"
+}
+```
+
+Use `open-code` (não o comando `opencode` puro) para garantir que o profile `bedrock` seja usado:
+
+```bash
+source ~/.zshrc
+open-code models
+```
+
+**Importante:** não rode `opencode auth login` para o provider `amazon-bedrock`. A prioridade de autenticação do opencode para Bedrock é:
+
+1. Bearer token (`AWS_BEARER_TOKEN_BEDROCK` ou `/connect`)
+2. Cadeia de credenciais AWS (profile, access keys, IAM roles)
+
+O `auth login` pergunta genericamente "Enter your API key" para qualquer provider, sem orientação específica para Bedrock. Colar o Access Key do IAM User nesse prompt grava um bearer token em `~/.local/share/opencode/auth.json`, que tem prioridade sobre a cadeia de credenciais AWS — e falha com `Invalid API Key format: Must start with pre-defined prefix`, já que um Access Key ID não é um bearer token válido do Bedrock.
+
+Se isso já aconteceu, remova a credencial errada para o opencode voltar a usar o profile `bedrock`:
+
+```bash
+opencode auth logout amazon-bedrock
+```
