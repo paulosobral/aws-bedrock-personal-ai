@@ -209,10 +209,10 @@ Install opencode:
 npm install -g opencode-ai
 ```
 
-Add a wrapper function to `~/.zshrc` (or `~/.bashrc`) that sets the Bedrock env vars and rewrites `opencode.jsonc` before every run:
+Add a setup function plus an alias to `~/.zshrc` (or `~/.bashrc`): the function sets the Bedrock env vars and rewrites `opencode.jsonc`, and the alias makes the bare `opencode` command run that setup before invoking the real binary. Use `command opencode` inside the alias — not a hardcoded path — so it resolves to whatever `opencode` is on `PATH` without recursing into the alias itself:
 
 ```bash
-open-code() {
+setup_opencode_bedrock() {
   export AWS_PROFILE=bedrock
   export AWS_REGION=us-east-1
   export AWS_DEFAULT_REGION=us-east-1
@@ -230,16 +230,16 @@ open-code() {
   }
 }
 EOF
-
-  opencode "$@"
 }
+
+alias opencode="setup_opencode_bedrock && command opencode"
 ```
 
-Use `open-code` (not the bare `opencode` command) so the `bedrock` profile is always picked up:
+This way you keep using the plain `opencode` command and the `bedrock` profile is always picked up automatically:
 
 ```bash
 source ~/.zshrc
-open-code models
+opencode models
 ```
 
 **Important:** do not run `opencode auth login` for the `amazon-bedrock` provider. opencode's Bedrock auth priority is:
