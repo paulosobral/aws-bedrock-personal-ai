@@ -200,3 +200,57 @@ claude "respond only 'ok' if Bedrock is accessible"
 ```
 
 If the call fails due to permission, check whether the role in `bedrock_role_arn` already has access enabled to the desired model in the [Bedrock console (Model access)](https://console.aws.amazon.com/bedrock/) — the Terraform policy grants `InvokeModel`, but the model subscription/enablement itself is done separately by AWS.
+
+### 3. opencode pointing to Bedrock
+
+Install opencode:
+
+```bash
+npm install -g opencode-ai
+```
+
+Add a wrapper function to `~/.zshrc` (or `~/.bashrc`) that sets the Bedrock env vars and rewrites `opencode.jsonc` before every run:
+
+```bash
+open-code() {
+  export AWS_PROFILE=bedrock
+  export AWS_REGION=us-east-1
+  export AWS_DEFAULT_REGION=us-east-1
+
+  mkdir -p "$HOME/.config/opencode"
+  cat > "$HOME/.config/opencode/opencode.jsonc" <<'EOF'
+{
+  "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "amazon-bedrock": {
+      "options": {
+        "region": "us-east-1"
+      }
+    }
+  }
+}
+EOF
+
+  opencode "$@"
+}
+```
+
+Use `open-code` (not the bare `opencode` command) so the `bedrock` profile is always picked up:
+
+```bash
+source ~/.zshrc
+open-code models
+```
+
+**Important:** do not run `opencode auth login` for the `amazon-bedrock` provider. opencode's Bedrock auth priority is:
+
+1. Bearer token (`AWS_BEARER_TOKEN_BEDROCK` or `/connect`)
+2. AWS credential chain (profile, access keys, IAM roles)
+
+`auth login` prompts a generic "Enter your API key" for any provider, with no Bedrock-specific guidance. Pasting the IAM User's Access Key there gets stored as a bearer token in `~/.local/share/opencode/auth.json`, which takes priority over the AWS credential chain — and fails with `Invalid API Key format: Must start with pre-defined prefix`, since an Access Key ID isn't a valid Bedrock bearer token.
+
+If this already happened, remove the bad credential so opencode falls back to the `bedrock` profile:
+
+```bash
+opencode auth logout amazon-bedrock
+```
